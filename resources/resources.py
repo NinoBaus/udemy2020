@@ -27,9 +27,6 @@ class Search(Resource):
         id = args["id"]
         show = args["show"]
         getter = TableCreator(search_items).return_item(args)
-        for f in getter:
-            updated_item = {"id":f[0], "name": f[1], "price": f[2], "picture": f[3], "expire": f[4], "link": f[5], "show": f[6]}
+        for fields in getter:
+            updated_item = {"id":fields[0], "name": fields[1], "price": fields[2], "picture": fields[3], "expire": fields[4], "link": fields[5], "show": fields[6]}
         return updated_item
-
-
-
