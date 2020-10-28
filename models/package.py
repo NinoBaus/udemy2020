@@ -35,7 +35,7 @@ class Pack:
         i = 1
         # iterate through pages
         while i <= page_number:
-            cls.url_auction = self.url_auction + str(i)
+            cls.url_auction = cls.url_auction + str(i)
             cls.return_ads()
             i += 1
 

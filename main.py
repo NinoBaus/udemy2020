@@ -1,6 +1,6 @@
 from flask import Flask
 from resources.resources import Search
-from flask_restful import Api , Resource
+from flask_restful import Api
 
 from db import db
 
