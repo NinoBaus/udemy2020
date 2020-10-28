@@ -10,5 +10,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db.init_app(app)
 api.add_resource(Search, "/<string:search_items>")
 
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+
 if __name__ == '__main__':
     app.run(port=9090 , debug=True)
