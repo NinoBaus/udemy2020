@@ -15,7 +15,7 @@ api.add_resource(Search, "/<string:search_items>")
 @app.route('/', methods=['GET','POST'])
 def hello_world():
     if request.method == 'GET':
-        return render_template("index.html")
+        return render_template("index.html", hide="hidden")
     else:
         print("Radi")
         return render_template("index.html")
