@@ -30,13 +30,12 @@ class Pack:
         else:
             return None
 
-    @classmethod
-    def iterate_pages(cls, page_number):
+    def iterate_pages(self, page_number):
         i = 1
         # iterate through pages
         while i <= page_number:
-            cls.url_auction = cls.url_auction + str(i)
-            cls.return_ads()
+            self.url_auction = self.url_auction + str(i)
+            self.return_ads()
             i += 1
 
     def return_ads(self):

@@ -80,3 +80,14 @@ class TableCreator:
         except Exception as e:
             if "no such table" in str(e):
                 return None
+
+    def get_first_item(self, id):
+        try:
+            connection = sqlite3.connect("database.db")
+            cursor = connection.cursor()
+            get = f"SELECT * FROM {self.name} WHERE ID={id} AND show=True"
+            retrieve_first_item = cursor.execute(get).fetchall()
+            connection.close()
+            return retrieve_first_item
+        except Exception as e:
+            print(str(e) + " ovde puca")
