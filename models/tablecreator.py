@@ -1,4 +1,28 @@
 import sqlite3
+from db import db
+from models.all_ads import All_ads
+
+
+class TableAds:
+    def create_all_ads(self, name, price, picture, expire, link, search):
+        query = All_ads(name=name, price=price, picture=picture, expire=expire, link=link, search=search)
+        db.session.add(query)
+        db.session.commit()
+
+    def retrieve_all_ads(self, search):
+        All_ads().query.filter_by(search=search).all()
+        return 201
+
+    def update_ad_by_id(self, search, id):
+        query = All_ads().query.filter_by(search=search, id=id).first()
+        query.show = False
+        db.session.commit()
+
+    def retrieve_first_item(self, search, id):
+        query = All_ads().query.filter_by(search=search, id=id).first()
+        return query
+
+
 
 class TableCreator:
     def __init__(self, name):
@@ -20,6 +44,7 @@ class TableCreator:
     def create_table(self):
         """
         Creating table with customers search value
+        DONE
         """
         connection = sqlite3.connect("database.db")
         cursor = connection.cursor()
@@ -29,9 +54,9 @@ class TableCreator:
         cursor.execute(create_table)
 
         connection.close()
-
     def post_items(self, *args):
         """
+        DONE
         Posting items from serach in db
         1. ID           Unique identifier
         2. Name         Ad name String
@@ -51,7 +76,6 @@ class TableCreator:
 
         connection.commit()
         connection.close()
-
     def retrieve_items(self):
         try:
             connection = sqlite3.connect("database.db")
@@ -64,7 +88,6 @@ class TableCreator:
         except Exception as e:
             if "no such table" in str(e):
                 return None
-    
     def return_item(self, *args):
         try:
             connection = sqlite3.connect("database.db")
@@ -80,7 +103,6 @@ class TableCreator:
         except Exception as e:
             if "no such table" in str(e):
                 return None
-
     def get_first_item(self, id):
         try:
             connection = sqlite3.connect("database.db")

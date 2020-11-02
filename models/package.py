@@ -2,7 +2,7 @@ import requests as req
 from bs4 import BeautifulSoup as Soup
 import sqlite3
 from threading import Thread
-from models.tablecreator import TableCreator
+from models.tablecreator import TableAds
 
 
 class Pack:
@@ -91,8 +91,8 @@ class Pack:
             ad_link = ad_link_finder["href"]
 
             #storing ads in db
-            ad_tuple = (ad_name, ad_price, ad_picture, ad_expire, ad_link)
-            TableCreator(self.table_name).post_items(ad_tuple)
+            ad_tuple = (ad_name, ad_price, ad_picture, ad_expire, ad_link, self.search)
+            TableAds().create_all_ads(ad_tuple)
 
 
     def pagination(self, url):

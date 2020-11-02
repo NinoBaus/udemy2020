@@ -2,18 +2,22 @@ from flask import Flask, request
 from flask import render_template
 from resources.resources import Search
 from models.package import Pack
-from models.tablecreator import TableCreator
+from models.tablecreator import TableCreator, TableAds
 from flask_restful import Api
 
-from db import db
+#
 
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-db.init_app(app)
+app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 api.add_resource(Search, "/<string:search_items>")
 AD_COUNTER = 1
 USER_SEARCH = ""
+
+@app.before_request
+def create_tables():
+    db.create_all()
 
 @app.route('/', methods=['GET','POST'])
 def home():
@@ -49,4 +53,6 @@ def next():
 
 
 if __name__ == '__main__':
+    from db import db
+    db.init_app(app)
     app.run(port=9090 , debug=True)
