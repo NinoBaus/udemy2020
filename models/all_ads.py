@@ -1,17 +1,23 @@
 from db import db
+from sqlalchemy import Table, Column, Integer, String, Boolean, DateTime
+from sqlalchemy import ForeignKey
 from datetime import datetime
+from models.user import User
 
-class All_ads(db.Model):
+class All_ads(db):
     __tablename__ = "all_ads"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    price = db.Column(db.Integer)
-    picture = db.Column(db.String)
-    expire = db.Column(db.String)
-    link = db.Column(db.String)
-    search = db.Column(db.String)
-    show = db.Column(db.Boolean, default=True)
-    # created_at = db.Column(db.DateTime, default=datetime.now)
+
+    id = Column(Integer(), primary_key=True)
+    name = Column(String(80))
+    price = Column(Integer())
+    picture = Column(String())
+    expire = Column(String())
+    link = Column(String(), unique=True)
+    search = Column(String())
+    show = Column(Boolean(), default=True)
+    created_at = Column(DateTime(), default=datetime.now)
+    updated_at = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
+    user_id = Column(Integer(), ForeignKey('user.id'))
 
 
 '''
@@ -24,3 +30,6 @@ class All_ads(db.Model):
         self.search = search
 
 '''
+
+
+All_ads()

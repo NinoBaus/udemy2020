@@ -4,8 +4,7 @@ from resources.resources import Search
 from models.package import Pack
 from models.tablecreator import TableCreator, TableAds
 from flask_restful import Api
-
-#
+# from sqlalchemy import create_engine
 
 app = Flask(__name__)
 api = Api(app)
@@ -54,5 +53,4 @@ def next():
 
 if __name__ == '__main__':
     from db import db
-    db.init_app(app)
     app.run(port=9090 , debug=True)

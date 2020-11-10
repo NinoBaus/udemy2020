@@ -1,8 +1,8 @@
-from main import db
+from db import db
+from sqlalchemy import Table, Column, Integer, String
 
-class User(db.Model):
+class User(db):
     __tablename__ = "user"
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String)
-    passward = db.Column(db.String)
+    id = Column(Integer, primary_key=True)
+    username = Column(String(80), nullable=False, unique=True)
+    password = Column(String(80))
