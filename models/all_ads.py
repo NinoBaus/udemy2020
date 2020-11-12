@@ -2,7 +2,9 @@ from db import db
 from sqlalchemy import Table, Column, Integer, String, Boolean, DateTime
 from sqlalchemy import ForeignKey
 from datetime import datetime
-from models.user import User
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy import create_engine
+engine = create_engine('sqlite:///:memory:')
 
 class All_ads(db):
     __tablename__ = "all_ads"
@@ -19,6 +21,8 @@ class All_ads(db):
     updated_at = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
     user_id = Column(Integer(), ForeignKey('user.id'))
 
+    user = relationship("User", backref=backref('user', order_by=id))
+
 
 '''
     def __init__(self, name, price, picture, expire, link, search):
@@ -30,6 +34,3 @@ class All_ads(db):
         self.search = search
 
 '''
-
-
-All_ads()

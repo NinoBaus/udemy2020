@@ -91,8 +91,14 @@ class Pack:
             ad_link = ad_link_finder["href"]
 
             #storing ads in db
-            ad_tuple = (ad_name, ad_price, ad_picture, ad_expire, ad_link, self.search)
-            TableAds().create_all_ads(ad_tuple)
+            # ad_tuple = (ad_name, ad_price, ad_picture, ad_expire, ad_link, self.search)
+            '''ad_dict = {"name": ad_name,
+                       "price":ad_price,
+                       "picture":ad_picture,
+                       "expire":ad_expire,
+                       "link":ad_link,
+                       "search":self.search}'''
+            TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, link=ad_link, search=self.search)
 
 
     def pagination(self, url):

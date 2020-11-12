@@ -1,13 +1,14 @@
 import sqlite3
-from db import db
+from db import session
 from models.all_ads import All_ads
+from sqlalchemy import and_
 
 
 class TableAds:
     def create_all_ads(self, name, price, picture, expire, link, search):
         query = All_ads(name=name, price=price, picture=picture, expire=expire, link=link, search=search)
-        db.session.add(query)
-        db.session.commit()
+        session.add(query)
+        session.commit()
 
     def retrieve_all_ads(self, search):
         All_ads().query.filter_by(search=search).all()
@@ -16,13 +17,13 @@ class TableAds:
     def update_ad_by_id(self, search, id):
         query = All_ads().query.filter_by(search=search, id=id).first()
         query.show = False
-        db.session.commit()
+        session.commit()
 
     def retrieve_first_item(self, search, id):
-        query = All_ads().query.filter_by(search=search, id=id).first()
+        query = session.query(All_ads).filter(
+            and_(All_ads.search==search,
+                 All_ads.id==id)).first()
         return query
-
-
 
 class TableCreator:
     def __init__(self, name):
