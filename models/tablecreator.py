@@ -1,12 +1,13 @@
 import sqlite3
 from db import session
 from models.all_ads import All_ads
+from models.user import User
 from sqlalchemy import and_
 
 
 class TableAds:
-    def create_all_ads(self, name, price, picture, expire, link, search):
-        query = All_ads(name=name, price=price, picture=picture, expire=expire, link=link, search=search)
+    def create_all_ads(self, name, price, picture, expire, link, search, user_id):
+        query = All_ads(name=name, price=price, picture=picture, expire=expire, link=link, search=search, user_id=user_id)
         session.add(query)
         session.commit()
 
@@ -24,6 +25,31 @@ class TableAds:
             and_(All_ads.search==search,
                  All_ads.id==id)).first()
         return query
+
+    def retrieve_search(self, search):
+        query = session.query(All_ads).filter(All_ads.search == search).first()
+        return query
+
+    def retrive_if_link_exists_and_user_id(self, link, id):
+        query = session.query(All_ads).filter(
+            and_(
+                All_ads.user_id == id,
+                All_ads.link == link
+            )
+        ).first()
+        return query
+
+    def set_new_expire(self, link, id, expire):
+        query = self.retrive_if_link_exists_and_user_id(link, id)
+        query.expire = expire
+        session.commit()
+
+class User_query:
+    def return_user_id_by_username(self, username):
+        query = session.query(User).filter(User.username == username).first()
+        return query.id
+
+
 
 class TableCreator:
     def __init__(self, name):

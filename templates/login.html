@@ -1,21 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-<body>
-    <div class="search">
-         <form method="post" class="loginUsername">
-            <input name="loginUsername" type="text">
-         </form>
-        <form method="post" class="loginPasword">
-            <input name="loginPassword" type="text">
-         </form>
-      </div>
-    <form action="/search_ad" name="passForm" id="buttonLogin" method="get">
-            <input name="pass" type="submit" value="Login">
-         </form>
+{%block title%} {{ login_title }} {% endblock %}
 
-</body>
-</html>
+{%block content%}
+<form action = '/logins' method="post">
+   <p>Enter your username and password:</p>
+   <p><input type="text"  placeholder="username"  name="username" /></p>
+   <p><input type="text"  placeholder="password"  name="password" /></p>
+   <p><input type="submit" value="submit" /></p>
+</form>
+{%endblock%}

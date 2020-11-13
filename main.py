@@ -13,6 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 api.add_resource(Search, "/<string:search_items>")
 AD_COUNTER = 1
 USER_SEARCH = ""
+USER_ID = 0
 
 @app.before_request
 def create_tables():
@@ -22,18 +23,33 @@ def create_tables():
 def home():
     return render_template("start.html")
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET','POST'])
 def login():
-    return render_template("login.html")
+    if request.method == 'GET':
+        return render_template("login.html", login_title="Wrong username or passward")
+    return render_template("login.html", login_title="Login")
 
-@app.route('/singup', methods=['POST'])
+@app.route('/logins', methods=['POST', 'GET'])
+def logins():
+    condition = Users(username=request.form['username'], password=request.form['password']).login()
+    # print(condition)
+    if condition:
+        return redirect(url_for('search_ad'))
+    return redirect(url_for('login'))
+
+@app.route('/singup', methods=['GET','POST'])
 def singup():
+    if request.method == 'GET':
+        return render_template("singup.html", singup_title="Username already exists!")
     return render_template("singup.html", singup_title="Sing Up")
+
 
 @app.route('/singups', methods=['POST'])
 def singups():
+    global USER_ID
     condition = Users(username=request.form['username'], password=request.form['password']).singup()
     if condition:
+        USER_ID = condition
         return redirect(url_for('search_ad'))
     return redirect(url_for('singup'))
 
@@ -41,11 +57,13 @@ def singups():
 def search_ad():
     global AD_COUNTER
     global USER_SEARCH
+    global USER_ID
     if request.method == 'GET':
         return render_template("index.html", hide="hidden", placeholder="Unesite pojam...")
     elif request.method == 'POST':
         USER_SEARCH = str(request.form['searchInput'])
-        start_storring = Pack(USER_SEARCH).store_ads()
+        # print(USER_ID)
+        start_storring = Pack(search=USER_SEARCH, user_id=USER_ID).store_ads()
         if start_storring:
             comparator = True
             while comparator:

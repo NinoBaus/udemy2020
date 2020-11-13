@@ -6,7 +6,8 @@ from models.tablecreator import TableAds
 
 
 class Pack:
-    def __init__(self, search=""):
+    def __init__(self, user_id, search=""):
+        self.user_id = user_id
         self.search = search.replace("_", " ")
         self.table_name = search
         self.url_auction = f"https://www.limundo.com/pretragaLimundo.php?bSearchBox=1&txtPretraga={self.search}&Submit=&sSort=vreme&sSmer=ASC&tipCena=2&iStr="
@@ -19,7 +20,7 @@ class Pack:
 
             # if there is only 1 page, run code only for that page
             if pagination == 0:
-                self.return_ads()
+                self.return_ads(self.user_id)
                 return 201
             else:
                 pages = self.pagination(self.url_auction)
@@ -35,12 +36,13 @@ class Pack:
         # iterate through pages
         while i <= page_number:
             self.url_auction = self.url_auction + str(i)
-            self.return_ads()
+            self.return_ads(self.user_id)
             i += 1
 
-    def return_ads(self):
+    def return_ads(self, user_id):
         response = req.get(self.url_auction)
         soup_prepare = Soup(response.text , "html.parser")
+        get_search = TableAds().retrieve_search(self.search)
         for ads in soup_prepare.find_all(class_="auction_list_item auction_item"):
             #AD_NAME
             ad_name_finder = ads.find_all("a")
@@ -89,17 +91,15 @@ class Pack:
             #AD_LINK
             ad_link_finder = ads.find("a", href=True)
             ad_link = ad_link_finder["href"]
-
-            #storing ads in db
-            # ad_tuple = (ad_name, ad_price, ad_picture, ad_expire, ad_link, self.search)
-            '''ad_dict = {"name": ad_name,
-                       "price":ad_price,
-                       "picture":ad_picture,
-                       "expire":ad_expire,
-                       "link":ad_link,
-                       "search":self.search}'''
-            TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, link=ad_link, search=self.search)
-
+            #CHECK IF LINK EXISTS FOR USER_ID
+            if get_search:
+                if TableAds().retrive_if_link_exists_and_user_id(ad_link, self.user_id):
+                    TableAds().set_new_expire(ad_link, self.user_id, ad_expire)
+                else:
+                    TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, link=ad_link, search=self.search, user_id=user_id)
+            else:
+                TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire,
+                                          link=ad_link, search=self.search, user_id=user_id)
 
     def pagination(self, url):
         response_pagination = req.get(url)

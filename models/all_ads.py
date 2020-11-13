@@ -14,14 +14,14 @@ class All_ads(db):
     price = Column(Integer())
     picture = Column(String())
     expire = Column(String())
-    link = Column(String(), unique=True)
+    link = Column(String())
     search = Column(String())
     show = Column(Boolean(), default=True)
     created_at = Column(DateTime(), default=datetime.now)
     updated_at = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
-    user_id = Column(Integer(), ForeignKey('user.id'))
+    user_id = Column(Integer())
 
-    user = relationship("User", backref=backref('user', order_by=id))
+    # user = relationship("User", backref=backref('user', order_by=id))
 
 
 '''
