@@ -44,6 +44,19 @@ class TableAds:
         query.expire = expire
         session.commit()
 
+    def delete_ads_for_search(self, search, user_id):
+        query = session.query(All_ads).filter(
+            and_(
+                All_ads.search == search,
+                All_ads.user_id == user_id,
+                All_ads.show == 1
+            )
+        )
+        query.all()
+        for ad in query:
+            session.delete(ad)
+            session.commit()
+
 class User_query:
     def return_user_id_by_username(self, username):
         query = session.query(User).filter(User.username == username).first()

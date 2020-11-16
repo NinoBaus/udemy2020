@@ -11,19 +11,24 @@ class Pack:
         self.search = search.replace("_", " ")
         self.table_name = search
         self.url_auction = f"https://www.limundo.com/pretragaLimundo.php?bSearchBox=1&txtPretraga={self.search}&Submit=&sSort=vreme&sSmer=ASC&tipCena=2&iStr="
+        #check if search already exists
+        self.get_search = TableAds().retrieve_search(self.search)
+
 
     def store_ads(self):
         # check if search is valid
-        if self.check_if_search_is_valid(self.url_auction):
+        if self.check_if_search_is_valid():
             # store pages number in pagination variable
             pagination = self.pagination(self.url_auction)
-
+            #DELETE all ads that wasn't seen by the user, because we can have expired ads and don't want to show them
+            TableAds().delete_ads_for_search(self.search, self.user_id)
             # if there is only 1 page, run code only for that page
             if pagination == 0:
                 self.return_ads(self.user_id)
                 return 201
             else:
                 pages = self.pagination(self.url_auction)
+                # self.iterate_pages(pages)
                 pagination_thread = Thread(target=self.iterate_pages, args=(pages,))
                 pagination_thread.start()
                 return 201
@@ -32,18 +37,18 @@ class Pack:
             return None
 
     def iterate_pages(self, page_number):
-        i = 1
         # iterate through pages
-        while i <= page_number:
+        for i in range(page_number):
             self.url_auction = self.url_auction + str(i)
             self.return_ads(self.user_id)
-            i += 1
 
     def return_ads(self, user_id):
         response = req.get(self.url_auction)
         soup_prepare = Soup(response.text , "html.parser")
-        get_search = TableAds().retrieve_search(self.search)
+
         for ads in soup_prepare.find_all(class_="auction_list_item auction_item"):
+            # import time
+            # time.sleep(2)
             #AD_NAME
             ad_name_finder = ads.find_all("a")
             ad_name_list = ad_name_finder[1].text.strip("\n").split("  ")
@@ -92,14 +97,17 @@ class Pack:
             ad_link_finder = ads.find("a", href=True)
             ad_link = ad_link_finder["href"]
             #CHECK IF LINK EXISTS FOR USER_ID
-            if get_search:
+            if self.get_search:
                 if TableAds().retrive_if_link_exists_and_user_id(ad_link, self.user_id):
                     TableAds().set_new_expire(ad_link, self.user_id, ad_expire)
+                    print("Broj 1")
                 else:
                     TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, link=ad_link, search=self.search, user_id=user_id)
+                    print("Broj 2")
             else:
                 TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire,
                                           link=ad_link, search=self.search, user_id=user_id)
+                print("Broj 3")
 
     def pagination(self, url):
         response_pagination = req.get(url)
@@ -117,9 +125,8 @@ class Pack:
                     pass
             return pages_number[-1]
 
-    def check_if_search_is_valid(self, url):
-        response = req.get(url)
+    def check_if_search_is_valid(self):
+        response = req.get(self.url_auction)
         soup_prepare = Soup(response.text, "html.parser")
-        if "Trenutno nema aukcije" in soup_prepare.text:
-            return None
-        return True
+        if not "Trenutno nema aukcije" in soup_prepare.text:
+            return True

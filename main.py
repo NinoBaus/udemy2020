@@ -31,9 +31,10 @@ def login():
 
 @app.route('/logins', methods=['POST', 'GET'])
 def logins():
+    global USER_ID
     condition = Users(username=request.form['username'], password=request.form['password']).login()
-    # print(condition)
     if condition:
+        USER_ID = condition
         return redirect(url_for('search_ad'))
     return redirect(url_for('login'))
 
@@ -62,11 +63,9 @@ def search_ad():
         return render_template("index.html", hide="hidden", placeholder="Unesite pojam...")
     elif request.method == 'POST':
         USER_SEARCH = str(request.form['searchInput'])
-        # print(USER_ID)
         start_storring = Pack(search=USER_SEARCH, user_id=USER_ID).store_ads()
         if start_storring:
-            comparator = True
-            while comparator:
+            while True:
                 ad = TableAds().retrieve_first_item(search=USER_SEARCH,id=AD_COUNTER)
                 if ad:
                     return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire, picture=ad.picture, placeholder=USER_SEARCH)
