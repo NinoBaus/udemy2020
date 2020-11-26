@@ -1,7 +1,5 @@
 from db import db
-from sqlalchemy import Table, Column, Integer, String
-from sqlalchemy import create_engine
-engine = create_engine('sqlite:///:memory:')
+from sqlalchemy import Column, Integer, String
 
 class User(db):
     __tablename__ = "user"

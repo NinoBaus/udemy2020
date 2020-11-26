@@ -12,32 +12,42 @@ class TableAds:
         session.commit()
 
     def retrieve_all_ads(self, search):
-        All_ads().query.filter_by(search=search).all()
-        return 201
+        query = session.query(All_ads).filter_by(search=search).all()
+        return query
 
     def update_ad_by_id(self, search, id):
         query = All_ads().query.filter_by(search=search, id=id).first()
         query.show = False
         session.commit()
 
-    def retrieve_first_item(self, search, id):
+    def retrieve_ads_by_search_and_id(self, search, user_id):
         query = session.query(All_ads).filter(
-            and_(All_ads.search==search,
-                 All_ads.id==id)).first()
+            and_(
+                All_ads.search == search,
+                All_ads.user_id == user_id,
+                All_ads.show == 1
+            )
+        ).order_by(All_ads.id)
         return query
 
     def retrieve_search(self, search):
         query = session.query(All_ads).filter(All_ads.search == search).first()
         return query
 
-    def retrive_if_link_exists_and_user_id(self, link, id):
-        query = session.query(All_ads).filter(
-            and_(
-                All_ads.user_id == id,
-                All_ads.link == link
-            )
-        ).first()
-        return query
+    def retrive_if_link_exists_and_user_id(self, link, user_id, expire, price):
+        try:
+            query = session.query(All_ads).filter(
+                and_(
+                    All_ads.user_id == user_id,
+                    All_ads.link == link
+                )
+            ).first()
+            query.expire = expire
+            query.price = price
+            session.commit()
+            return query
+        except:
+            return None
 
     def set_new_expire(self, link, id, expire):
         query = self.retrive_if_link_exists_and_user_id(link, id)
@@ -56,6 +66,17 @@ class TableAds:
         for ad in query:
             session.delete(ad)
             session.commit()
+
+    def update_ad_save_remove(self, id, store):
+        '''
+        This should set the add to preview or not preview to the customer by updating show field to 0 for don't show and 2 for show ad
+        :param id: Ad ID
+        :param store: 0 > Not interested | 2 > Interested in ad
+        :return: None
+        '''
+        query = session.query(All_ads).filter(All_ads.id == id).first()
+        query.show = store
+        session.commit()
 
 class User_query:
     def return_user_id_by_username(self, username):

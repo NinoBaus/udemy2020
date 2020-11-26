@@ -21,5 +21,6 @@ class Users:
 
     def login(self):
         query = session.query(User).filter(User.username == self.username).first()
-        if self.password == query.password:
-            return query.id
+        if query:
+            if self.password == query.password:
+                return query.id

@@ -1,8 +1,8 @@
 import requests as req
 from bs4 import BeautifulSoup as Soup
-import sqlite3
 from threading import Thread
 from models.tablecreator import TableAds
+import time
 
 
 class Pack:
@@ -14,23 +14,22 @@ class Pack:
         #check if search already exists
         self.get_search = TableAds().retrieve_search(self.search)
 
-
     def store_ads(self):
         # check if search is valid
         if self.check_if_search_is_valid():
             # store pages number in pagination variable
             pagination = self.pagination(self.url_auction)
-            #DELETE all ads that wasn't seen by the user, because we can have expired ads and don't want to show them
-            TableAds().delete_ads_for_search(self.search, self.user_id)
             # if there is only 1 page, run code only for that page
             if pagination == 0:
                 self.return_ads(self.user_id)
                 return 201
             else:
+                # self.return_ads(self.user_id)
+                # time.sleep(5)
                 pages = self.pagination(self.url_auction)
-                # self.iterate_pages(pages)
-                pagination_thread = Thread(target=self.iterate_pages, args=(pages,))
-                pagination_thread.start()
+                self.iterate_pages(pages)
+                # pagination_thread = Thread(target=self.iterate_pages, args=(pages,))
+                # pagination_thread.start()
                 return 201
         # If search isn't valid return None
         else:
@@ -43,12 +42,15 @@ class Pack:
             self.return_ads(self.user_id)
 
     def return_ads(self, user_id):
+        '''
+        Storring data in db.
+        :param user_id:
+        :return: Currently nothing.
+        :TODO: Make this callable so it is more readable and it would be used only to get ads from the page
+        '''
         response = req.get(self.url_auction)
         soup_prepare = Soup(response.text , "html.parser")
-
         for ads in soup_prepare.find_all(class_="auction_list_item auction_item"):
-            # import time
-            # time.sleep(2)
             #AD_NAME
             ad_name_finder = ads.find_all("a")
             ad_name_list = ad_name_finder[1].text.strip("\n").split("  ")
@@ -98,10 +100,7 @@ class Pack:
             ad_link = ad_link_finder["href"]
             #CHECK IF LINK EXISTS FOR USER_ID
             if self.get_search:
-                if TableAds().retrive_if_link_exists_and_user_id(ad_link, self.user_id):
-                    TableAds().set_new_expire(ad_link, self.user_id, ad_expire)
-                    print("Broj 1")
-                else:
+                if not TableAds().retrive_if_link_exists_and_user_id(link=ad_link, user_id=self.user_id, expire=ad_expire, price=ad_price):
                     TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, link=ad_link, search=self.search, user_id=user_id)
                     print("Broj 2")
             else:

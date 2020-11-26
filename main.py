@@ -1,8 +1,8 @@
 from flask import Flask, request
 from flask import render_template, redirect, url_for
 from resources.resources import Search
-from models.package import Pack
-from models.tablecreator import TableCreator, TableAds
+from models.settup_filter_page import First_run
+from models.tablecreator import TableAds
 from models.users_services import Users
 from flask_restful import Api
 
@@ -56,33 +56,47 @@ def singups():
 
 @app.route('/search_ad', methods=['GET','POST'])
 def search_ad():
-    global AD_COUNTER
-    global USER_SEARCH
+    #user_id is global before I create user_id available once logged in
     global USER_ID
+    global ads
+    global prepare
     if request.method == 'GET':
         return render_template("index.html", hide="hidden", placeholder="Unesite pojam...")
     elif request.method == 'POST':
-        USER_SEARCH = str(request.form['searchInput'])
-        start_storring = Pack(search=USER_SEARCH, user_id=USER_ID).store_ads()
-        if start_storring:
-            while True:
-                ad = TableAds().retrieve_first_item(search=USER_SEARCH,id=AD_COUNTER)
-                if ad:
-                    return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire, picture=ad.picture, placeholder=USER_SEARCH)
-                AD_COUNTER += 1
+        user_search = str(request.form['searchInput'])
+        prepare = First_run(search=user_search, user_id=USER_ID)
+        if prepare.valid_search():
+            try:
+                ads = prepare.iterate_ads()
+                ad = next(ads)
+                return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3], picture=ad[4], placeholder=ad[5])
+            except StopIteration:
+                return "Nema vise oglasa \o/"
         return render_template("index.html", hide="hidden", placeholder="Nema oglasa koji trazite, probajte ponovo...")
 
 @app.route("/store" , methods=['POST'])
 def store():
-    return render_template("index.html", ad_name="Save")
+    global prepare
+    global ads
+    try:
+        TableAds().update_ad_save_remove(id=prepare.current_id, store=2)
+        ad = next(ads)
+        return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3],
+                               picture=ad[4], placeholder=ad[5])
+    except StopIteration:
+        return "Nema vise oglasa bro"
 
-@app.route("/next" , methods=['POST'])
-def next():
-    global AD_COUNTER
-    global USER_SEARCH
-    TableCreator(USER_SEARCH).return_item(AD_COUNTER)
-    AD_COUNTER += 1
-    return render_template("index.html", ad_name="Pass")
+@app.route("/dont_store" , methods=['POST'])
+def dont_store():
+    global prepare
+    global ads
+    try:
+        TableAds().update_ad_save_remove(id=prepare.current_id, store=0)
+        ad = next(ads)
+        return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3],
+                               picture=ad[4], placeholder=ad[5])
+    except StopIteration:
+        return "Nema vise oglasa bro"
 
 
 if __name__ == '__main__':
