@@ -1,39 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <title>Limundo tracker</title>
-   </head>
-   <body>
-      <h1>Dobro dosli na tracker za Limundo aukcije</h1>
-      <div class="search">
-         <form action="/search_ad" method="post" class="searchForm">
-            <input name="searchInput" type="text" placeholder="{{ placeholder }}" >
-         </form>
-      </div>
-      <div {{ hide }}>
-      <div class="price and expires">
-         <p style="float: left;">Cena: {{ price }}</p>
-         <p style="float: right;">Expires: {{ expires }}</p>
-      </div>
-      <div class="current_ad">
-         <a class='open-ad'  href={{ ad_name_href }}>
+
+<head>
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+   <meta charset="UTF-8">
+   <title>Limundo tracker</title>
+</head>
+
+<body style="background-color:burlywood">
+   <h1 style="text-align: center">Dobro dosli na tracker za Limundo aukcije</h1>
+   <div class="search" style="text-align: center" >
+      <form action="/search_ad" method="post" class="searchForm">
+         <input name="searchInput" type="text" placeholder="{{ placeholder }}">
+      </form>
+   </div>
+   <div font-size: large;  {{ hide }}>
+      <div style="text-align:center" class="current_ad">
+         <a class='open-ad' href={{ ad_name_href }} target="_blank"{{ ad_name_href }}>
             <h3> {{ad_name}} </h3>
          </a>
-         <img class="displayed" style="text-align: center;" src={{ picture }} alt="User Image" width="400" height="400">
       </div>
+      <br>
+      <div class="price and expires">
+         <p style="float:left; margin-left: 400px;">Cena: {{ price }}</p>
+         <p style="float: right; margin-right: 400px;">Expires: {{ expires }}</p>
+      </div>
+      <br>
+      <img class="img-thumbnail" src={{ picture }} alt="User Image" width="400" height="400">
+      <br>
       <div class="save-pass">
-         <divs style="float: left;">
-         <form action="/store" name="saveForm" id="buttonsSave" method="post">
-            <input  name="save" type="submit" value="Sacuvaj">
-         </form>
+         <div style="float: left; margin-left: 400px;">
+            <form action="/store" name="saveForm" id="buttonsSave" method="post">
+               <input type="submit" class="btn btn-success" value="Sacuvaj">
+            </form>
+         </div>
+         <div style="float: right; margin-right: 400px;">
+            <form action="/dont_store" name="passForm" id="buttonPass" method="post">
+               <input type="submit" class="btn btn-danger" value="Propusti">
+            </form>
+         </div>
       </div>
-      <div style="float: right;">
-         <form action="/dont_store" name="passForm" id="buttonPass" method="post">
-            <input name="pass" type="submit" value="Propusti" >
-         </form>
+      <br>
+      <br>
+      <div class="saved-passed">
+         <div style="float: left;">
+            <form action="/saved" name="saveForm" id="buttonSaved" method="post">
+               <input name="save" type="submit" value="Sacuvano">
+            </form>
+         </div>
+         <div style="float: right;">
+            <form action="/passed" name="passForm" id="buttonPassed" method="post">
+               <input name="pass" type="submit" value="Propusteno">
+            </form>
+         </div>
       </div>
-      </div>
-      </div>
-   </body>
+</body>
+
 </html>

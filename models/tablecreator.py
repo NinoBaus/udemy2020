@@ -78,6 +78,20 @@ class TableAds:
         query.show = store
         session.commit()
 
+    def return_saved_passed(self, search, user_id, show):
+        query = session.query(All_ads).filter(
+            and_(
+                All_ads.search == search,
+                All_ads.user_id == user_id,
+                All_ads.show == show
+            )
+        )
+        data = query.all()
+        return data
+
+    def return_passed(self):
+        pass
+
 class User_query:
     def return_user_id_by_username(self, username):
         query = session.query(User).filter(User.username == username).first()

@@ -1,9 +1,6 @@
 import requests as req
 from bs4 import BeautifulSoup as Soup
-from threading import Thread
 from models.tablecreator import TableAds
-import time
-
 
 class Pack:
     def __init__(self, user_id, search=""):
@@ -50,7 +47,10 @@ class Pack:
         '''
         response = req.get(self.url_auction)
         soup_prepare = Soup(response.text , "html.parser")
+        i = 0
         for ads in soup_prepare.find_all(class_="auction_list_item auction_item"):
+            i +=1
+
             #AD_NAME
             ad_name_finder = ads.find_all("a")
             ad_name_list = ad_name_finder[1].text.strip("\n").split("  ")
@@ -102,11 +102,9 @@ class Pack:
             if self.get_search:
                 if not TableAds().retrive_if_link_exists_and_user_id(link=ad_link, user_id=self.user_id, expire=ad_expire, price=ad_price):
                     TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, link=ad_link, search=self.search, user_id=user_id)
-                    print("Broj 2")
             else:
                 TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire,
                                           link=ad_link, search=self.search, user_id=user_id)
-                print("Broj 3")
 
     def pagination(self, url):
         response_pagination = req.get(url)

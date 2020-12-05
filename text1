@@ -1,0 +1,5 @@
+<b>checkout/created</b> | This will trigger when a checkout is successfully created.
+<b>checkout/updated</b> | This will trigger when a checkout is successfully updated.
+<b>checkout/processed</b> | This will trigger when a checkout is successfully processed.
+<b>app/uninstalled </b> | This will trigger when you uninstall OAuth app on your store.
+<b>recharge/uninstalled </b> | This will trigger when ReCharge is uninstalled from Shopify.
