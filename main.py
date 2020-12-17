@@ -1,17 +1,13 @@
 from flask import Flask, request, jsonify, g, session
 from flask import render_template, redirect, url_for
-from resources.resources import Search
-from resources.ads import ads_routes
+from resources.api_ads import ads_routes
 from models.settup_filter_page import First_run, Jeson_results
 from models.tablecreator import TableAds
 from models.users_services import Users
-from flask_restful import Api
 
 app = Flask(__name__)
 app.secret_key = "nestoskrivenos"
 app.register_blueprint(ads_routes)
-# api = Api(app)
-# api.add_resource(Search, "/<string:search_items>")
 
 @app.before_request
 def create_tables():
@@ -39,21 +35,21 @@ def logins():
         return redirect(url_for('search_ad'))
     return redirect(url_for('login'))
 
-@app.route('/singup', methods=['GET','POST'])
-def singup():
+@app.route('/signup', methods=['GET','POST'])
+def signup():
     if request.method == 'GET':
-        return render_template("singup.html", singup_title="Username already exists!")
-    return render_template("singup.html", singup_title="Sing Up")
+        return render_template("signup.html", signup_title="Username already exists!")
+    return render_template("signup.html", signup_title="sign Up")
 
 
-@app.route('/singups', methods=['POST'])
-def singups():
+@app.route('/signups', methods=['POST'])
+def signups():
     session.pop('user_id', None)
-    condition = Users(username=request.form['username'], password=request.form['password']).singup()
+    condition = Users(username=request.form['username'], password=request.form['password']).signup()
     if condition:
         session['user_id'] = condition
         return redirect(url_for('search_ad'))
-    return redirect(url_for('singup'))
+    return redirect(url_for('signup'))
 
 @app.route('/search_ad', methods=['GET','POST'])
 def search_ad():

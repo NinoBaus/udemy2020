@@ -33,6 +33,10 @@ class Jeson_results:
             ads_dict["expire"] = row.expire
             ads_dict["link"] = row.link
             ads_dict["search"] = row.search
+            ads_dict["show"] = row.search
+            ads_dict["created_at"] = row.search
+            ads_dict["updated_at"] = row.search
+            ads_dict["user_id"] = row.search
             table.append(ads_dict)
 
 

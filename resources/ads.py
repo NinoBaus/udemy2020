@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from flask_restful import reqparse
 
-ads_routes = Blueprint('ads', '__name__', url_defaults='/api')
+ads_routes = Blueprint('ads', __name__, url_defaults='/api')
 
 @ads_routes.route('/ads', methods=['GET', 'POST'])
 def ads():

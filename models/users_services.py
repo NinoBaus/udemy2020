@@ -8,7 +8,7 @@ class Users:
         self.username = username
         self.password = password
 
-    def singup(self):
+    def signup(self):
         try:
             new_user = User(username=self.username,password=self.password)
             session.add(new_user)
