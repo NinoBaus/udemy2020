@@ -17,7 +17,6 @@
 from flask import Blueprint, request
 from models.tablecreator import TableAds
 from models.settup_filter_page import Jeson_results
-from flask_restful import reqparse
 
 ads_routes = Blueprint('ads_routes', __name__, url_prefix='/api')
 
@@ -36,7 +35,7 @@ def ads():
     return {"Ads" : ads_list}
 
 
-@ads_routes.route('ads/count', method=['GET'])
+@ads_routes.route('ads/count', methods=['GET'])
 def count_ads():
     pass
 
