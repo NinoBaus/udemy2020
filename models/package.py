@@ -1,6 +1,7 @@
 import requests as req
 from bs4 import BeautifulSoup as Soup
 from models.tablecreator import TableAds
+from threading import Thread
 
 class Pack:
     def __init__(self, user_id, search=""):
@@ -21,12 +22,10 @@ class Pack:
                 self.return_ads(self.user_id)
                 return 201
             else:
-                # self.return_ads(self.user_id)
-                # time.sleep(5)
+                self.return_ads(self.user_id)
                 pages = self.pagination(self.url_auction)
-                self.iterate_pages(pages)
-                # pagination_thread = Thread(target=self.iterate_pages, args=(pages,))
-                # pagination_thread.start()
+                pagination_thread = Thread(target=self.iterate_pages, args=(pages,))
+                pagination_thread.start()
                 return 201
         # If search isn't valid return None
         else:
@@ -34,6 +33,8 @@ class Pack:
 
     def iterate_pages(self, page_number):
         # iterate through pages
+        import time
+        time.sleep(10)
         for i in range(page_number):
             self.url_auction = self.url_auction + str(i)
             self.return_ads(self.user_id)
