@@ -4,6 +4,7 @@ from resources.api_ads import ads_routes
 from models.settup_filter_page import First_run, Jeson_results
 from models.tablecreator import TableAds
 from models.users_services import Users
+from db import db, engine
 
 app = Flask(__name__)
 app.secret_key = "nestoskrivenos"
@@ -105,5 +106,4 @@ def passed():
 
 
 if __name__ == '__main__':
-    from db import db, engine
     app.run(port=9090, debug=True)
