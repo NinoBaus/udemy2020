@@ -106,4 +106,4 @@ def passed():
 
 if __name__ == '__main__':
     from db import db, engine
-    app.run(port=9090 , debug=True)
+    app.run(port=9090, debug=True)
