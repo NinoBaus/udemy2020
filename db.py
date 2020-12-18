@@ -5,6 +5,6 @@ from sqlalchemy.orm import sessionmaker
 
 
 db = declarative_base()
-engine = create_engine(os.environ.get('DATABAS_URL','sqlite:///database.db'),connect_args={"check_same_thread": False})
+engine = create_engine(os.environ.get('DATABAS_URL','sqlite:///database2.db'),connect_args={"check_same_thread": False})
 Session = sessionmaker(bind=engine)
 session = Session()
