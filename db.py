@@ -6,6 +6,6 @@ DATABASE_URL = os.environ['DATABASE_URL']
 
 
 db = declarative_base()
-engine = create_engine(DATABASE_URL,connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 session = Session()
