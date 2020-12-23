@@ -81,6 +81,8 @@ def store():
                                picture=ad[4], placeholder=ad[5])
     except StopIteration:
         return "Nema vise oglasa"
+    except Exception as e:
+        print(e)
 
 @app.route("/dont_store" , methods=['POST'])
 def dont_store():
@@ -91,6 +93,8 @@ def dont_store():
                                picture=ad[4], placeholder=ad[5])
     except StopIteration:
         return "Nema vise oglasa bro"
+    except Exception as e:
+        print(e)
 
 @app.route("/saved", methods=["POST"])
 def saved():
