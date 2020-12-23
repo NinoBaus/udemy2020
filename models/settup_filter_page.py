@@ -19,6 +19,7 @@ class First_run:
             self.current_id = ad.id
             yield ad.name, ad.price, ad.link, ad.expire, ad.picture, ad.search, ad.id
 
+
 class Jeson_results:
     def __init__(self):
         pass
