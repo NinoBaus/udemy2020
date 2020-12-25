@@ -68,6 +68,7 @@ def search_ad():
                 ad = next(ads)
                 return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3], picture=ad[4], placeholder=ad[5])
             except StopIteration:
+                # import ipdb;                ipdb.set_trace()
                 try:
                     ads = prepare.iterate_ads()
                     new_batch = next(ads)
@@ -90,6 +91,7 @@ def store():
         return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3],
                                picture=ad[4], placeholder=ad[5])
     except StopIteration:
+        # import ipdb;        ipdb.set_trace()
         try:
             ads = prepare.iterate_ads()
             new_batch = next(ads)
@@ -111,6 +113,7 @@ def dont_store():
         return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3],
                                picture=ad[4], placeholder=ad[5])
     except StopIteration:
+        # import ipdb;        ipdb.set_trace()
         try:
             ads = prepare.iterate_ads()
             new_batch = next(ads)

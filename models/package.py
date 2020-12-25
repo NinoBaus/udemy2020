@@ -19,10 +19,10 @@ class Pack:
             pagination = self.pagination(self.url_auction)
             # if there is only 1 page, run code only for that page
             if pagination == 0:
-                self.return_ads(self.user_id)
+                self.return_ads(self.user_id, self.url_auction)
                 return 201
             else:
-                self.return_ads(self.user_id)
+                self.return_ads(self.user_id, self.url_auction)
                 pages = self.pagination(self.url_auction)
                 pagination_thread = Thread(target=self.iterate_pages, args=(pages,))
                 pagination_thread.start()
@@ -34,19 +34,19 @@ class Pack:
     def iterate_pages(self, page_number):
         # iterate through pages
         import time
-        time.sleep(10)
+        time.sleep(5)
         for i in range(page_number):
-            self.url_auction = self.url_auction + str(i)
-            self.return_ads(self.user_id)
+            url = self.url_auction + str(i)
+            self.return_ads(self.user_id, url)
 
-    def return_ads(self, user_id):
+    def return_ads(self, user_id, url):
         '''
         Storring data in db.
         :param user_id:
         :return: Currently nothing.
         :TODO: Make this callable so it is more readable and it would be used only to get ads from the page
         '''
-        response = req.get(self.url_auction)
+        response = req.get(url)
         soup_prepare = Soup(response.text , "html.parser")
         i = 0
         for ads in soup_prepare.find_all(class_="auction_list_item auction_item"):
@@ -106,6 +106,8 @@ class Pack:
             else:
                 TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire,
                                           link=ad_link, search=self.search, user_id=user_id)
+
+            response.close()
 
     def pagination(self, url):
         response_pagination = req.get(url)
