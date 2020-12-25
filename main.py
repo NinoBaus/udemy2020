@@ -66,16 +66,16 @@ def search_ad():
             try:
                 ads = prepare.iterate_ads()
                 ad = next(ads)
-
                 return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3], picture=ad[4], placeholder=ad[5])
             except StopIteration:
-                ads = prepare.iterate_ads()
-                if ads:
+                try:
+                    ads = prepare.iterate_ads()
                     new_batch = next(ads)
                     return render_template("index.html", ad_name=new_batch[0], price=new_batch[1],
-                                           ad_name_href=new_batch[2], expires=new_batch[3],
+                                           ad_name_href=new_batch[2],
+                                           expires=new_batch[3],
                                            picture=new_batch[4], placeholder=new_batch[5])
-                else:
+                except StopIteration:
                     return "Nema vise oglasa"
         return render_template("index.html", hide="hidden", placeholder="Nema oglasa koji trazite, probajte ponovo...")
 
@@ -88,12 +88,13 @@ def store():
         return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3],
                                picture=ad[4], placeholder=ad[5])
     except StopIteration:
-        ads = prepare.iterate_ads()
-        if ads:
+        try:
+            ads = prepare.iterate_ads()
             new_batch = next(ads)
-            return render_template("index.html", ad_name=new_batch[0], price=new_batch[1], ad_name_href=new_batch[2], expires=new_batch[3],
-                               picture=new_batch[4], placeholder=new_batch[5])
-        else:
+            return render_template("index.html", ad_name=new_batch[0], price=new_batch[1], ad_name_href=new_batch[2],
+                                   expires=new_batch[3],
+                                   picture=new_batch[4], placeholder=new_batch[5])
+        except StopIteration:
             return "Nema vise oglasa"
     except Exception as e:
         print(e)
@@ -107,23 +108,23 @@ def dont_store():
         return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3],
                                picture=ad[4], placeholder=ad[5])
     except StopIteration:
-        ads = prepare.iterate_ads()
-        if ads:
+        try:
+            ads = prepare.iterate_ads()
             new_batch = next(ads)
             return render_template("index.html", ad_name=new_batch[0], price=new_batch[1], ad_name_href=new_batch[2], expires=new_batch[3],
                                picture=new_batch[4], placeholder=new_batch[5])
-        else:
+        except StopIteration:
             return "Nema vise oglasa"
     except Exception as e:
         print(e)
 
-@app.route("/saved", methods=["POST"])
+@app.route("/saved", methods=["GET","POST"])
 def saved():
     saved_ads = TableAds().return_saved_passed(prepare.search, g.user, 2)
     ads = Jeson_results().pack_json(saved_ads)
     return jsonify({"oglasi": ads})
 
-@app.route("/passed", methods=["POST"])
+@app.route("/passed", methods=["GET","POST"])
 def passed():
     saved_ads = TableAds().return_saved_passed(prepare.search, g.user, 0)
     ads = Jeson_results().pack_json(saved_ads)
