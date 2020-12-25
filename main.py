@@ -77,6 +77,8 @@ def search_ad():
                                            picture=new_batch[4], placeholder=new_batch[5])
                 except StopIteration:
                     return "Nema vise oglasa"
+            except Exception as e:
+                return str(e)
         return render_template("index.html", hide="hidden", placeholder="Nema oglasa koji trazite, probajte ponovo...")
 
 @app.route("/store" , methods=['POST'])
@@ -98,7 +100,7 @@ def store():
             return "Nema vise oglasa"
     except Exception as e:
         print(e)
-        return e
+        return str(e)
 
 @app.route("/dont_store" , methods=['POST'])
 def dont_store():
@@ -118,7 +120,7 @@ def dont_store():
             return "Nema vise oglasa"
     except Exception as e:
         print(e)
-        return e
+        return str(e)
 
 @app.route("/saved", methods=["GET","POST"])
 def saved():
