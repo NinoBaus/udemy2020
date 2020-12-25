@@ -98,6 +98,7 @@ def store():
             return "Nema vise oglasa"
     except Exception as e:
         print(e)
+        return e
 
 @app.route("/dont_store" , methods=['POST'])
 def dont_store():
@@ -117,6 +118,7 @@ def dont_store():
             return "Nema vise oglasa"
     except Exception as e:
         print(e)
+        return e
 
 @app.route("/saved", methods=["GET","POST"])
 def saved():
