@@ -1,59 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'login_signup_template.html' %}
 
-<head>
-   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-   <meta charset="UTF-8">
-   <title>Limundo tracker</title>
-</head>
+{%block title%} Limundo-Tracker {% endblock %}
 
-<body style="background-color:burlywood">
+{%block navbar%}
+<div class="collapse navbar-collapse" id="navbarNav">
+   <ul class="navbar-nav">
+      <li class="nav-item">
+         <a class="nav-link" href="/saved">Saved</a>
+      </li>
+      <li class="nav-item">
+         <a class="nav-link" href="/passed">Unsaved</a>
+      </li>
+   </ul>
+</div>
+
+<div class="collapse navbar-collapse" id="navbarNav1">
+   <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+         <a class="nav-link" href="#"> {{username}} </a>
+      </li>
+      <li class="nav-item active">
+         <a class="nav-link" href="/signup">Log out</a>
+      </li>
+   </ul>
+</div>
+{%endblock%}
+
+
+{%block body%}
    <h1 style="text-align: center">Dobro dosli na tracker za Limundo aukcije</h1>
    <div class="search" style="text-align: center" >
-      <form action="/search_ad" method="post" class="searchForm">
-         <input name="searchInput" type="text" placeholder="{{ placeholder }}">
-      </form>
    </div>
-   <div font-size: large;  {{ hide }}>
-      <div style="text-align:center" class="current_ad">
-         <a class='open-ad' href={{ ad_name_href }} target="_blank"{{ ad_name_href }}>
-            <h3> {{ad_name}} </h3>
-         </a>
+
+   <div class="container">
+      <div class="row">
+         <div class="col-sm-12" style="text-align:center">
+            <form action="/search_ad" method="post" class="searchForm">
+               <input name="searchInput" type="text" placeholder="{{ placeholder }}">
+            </form>
+         </div>
       </div>
-      <br>
-      <div class="price and expires">
-         <p style="float:left; margin-left: 400px;">Cena: {{ price }}</p>
-         <p style="float: right; margin-right: 400px;">Expires: {{ expires }}</p>
-      </div>
-      <br>
-      <img class="img-thumbnail" src={{ picture }} alt="User Image" width="400" height="400">
-      <br>
-      <div class="save-pass">
-         <div style="float: left; margin-left: 400px;">
+   </div>
+
+   <div class="container"  {{ hide }}>
+      <div class="row">
+         <div class="col-12" style="text-align:center">
+            <div style="text-align:center" class="current_ad">
+               <a class='open-ad' href={{ ad_name_href }} target="_blank"{{ ad_name_href }}>
+               <h3> {{ad_name}} </h3>
+               </a>
+            </div>
+         </div>
+
+         <div class="col-12"></div>
+
+         <div class="col-3"></div>
+         <div class="col-3" style="text-align:center">
+            <p>Cena: {{ price }}</p>
+         </div>
+         <div class="col-3" style="text-align:center">
+            <p>Expires: {{ expires }}</p>
+         </div>
+         <div class="col-3"></div>
+
+         <div class="col-12 mb-3" style="text-align:center">
+            <img class="img-thumbnail" src={{ picture }} alt="User Image" width="400" height="400">
+         </div>
+
+         <div class="col-3"></div>
+         <div class="col-3" style="text-align:center">
             <form action="/store" name="saveForm" id="buttonsSave" method="post">
                <input type="submit" class="btn btn-success" value="Sacuvaj">
             </form>
          </div>
-         <div style="float: right; margin-right: 400px;">
+         <div class="col-3" style="text-align:center">
             <form action="/dont_store" name="passForm" id="buttonPass" method="post">
                <input type="submit" class="btn btn-danger" value="Propusti">
             </form>
          </div>
-      </div>
-      <br>
-      <br>
-      <div class="saved-passed">
-         <div style="float: left;">
-            <form action="/saved" name="saveForm" id="buttonSaved" method="post">
-               <input name="save" type="submit" value="Sacuvano">
-            </form>
-         </div>
-         <div style="float: right;">
-            <form action="/passed" name="passForm" id="buttonPassed" method="post">
-               <input name="pass" type="submit" value="Propusteno">
-            </form>
-         </div>
-      </div>
-</body>
+         <div class="col-3"></div>
 
-</html>
+      </div>
+   </div>
+{%endblock%}

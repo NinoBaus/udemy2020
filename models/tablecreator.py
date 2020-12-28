@@ -93,6 +93,16 @@ class TableAds:
         data = query.all()
         return data
 
+    def first_add_that_should_be_seen(self, search, user_id):
+        query = session.query(All_ads).filter(
+            and_(
+                All_ads.search == search,
+                All_ads.user_id == user_id,
+                All_ads.show == 1
+            )
+        ).order_by(All_ads.updated_at.desc()).first()
+        return query
+
 class User_query:
     def return_user_id_by_username(self, username):
         query = session.query(User).filter(User.username == username).first()

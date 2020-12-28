@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>
+        {%block title%}{% endblock %}
+    </title>
+    <style>
+        .center {
+          margin: auto;
+          width: 60%;
+          padding: 10px;
+        }
+    </style>
+</head>
+
+    <body style="background-color:#99AD00">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <a class="navbar-brand" href="/">Limundo-Tracker</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+              {%block navbar%} {%endblock%}
+
+        </nav>
+
+        <div class="center">
+            {%block body%}{%endblock%}
+        </div>
+    </body>
+</html>
