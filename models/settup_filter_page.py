@@ -30,6 +30,7 @@ class Jeson_results:
             ads_dict = {}
             ads_dict["id"] = row.id
             ads_dict["name"] = row.name
+            ads_dict["picture"] = row.picture
             ads_dict["price"] = row.price
             ads_dict["expire"] = row.expire
             ads_dict["link"] = row.link

@@ -1,0 +1,67 @@
+{% extends 'login_signup_template.html' %}
+
+{%block title%} {{save}} {%endblock%}
+
+{%block body%}
+
+{%block navbar%}
+<div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/search_ad">Search ads</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/saved">Saved</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/passed">Unsaved</a>
+        </li>
+    </ul>
+</div>
+
+<div class="collapse navbar-collapse" id="navbarNav1">
+   <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+         <a class="nav-link" href="#"> {{username}} </a>
+      </li>
+      <li class="nav-item">
+         <a class="nav-link" href="/logout">Log out</a>
+      </li>
+   </ul>
+</div>
+{%endblock%}
+
+
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                {%for header in headers%}
+                    <th scope="col">{{header}}</th>
+                {%endfor%}
+                <th> {{ remove_store }} </th>
+            </tr>
+        </thead>
+    {%for ad in ads%}
+        <tr>
+            <td><img src="{{ ad['picture'] }}" width="100" height="100"></td>
+            <td>{{ ad["name"] }}</td>
+            <td>{{ ad["price"] }}</td>
+            <td>{{ ad["expire"] }}</td>
+            <td>
+                    <a href={{ ad["link"] }} target=_blank{{ ad["link"] }}> Link
+            </td>
+            <td>
+                {% if remove_store == "Obrisi" %}
+                    <form action="/saved" method="post">
+                        <input type="submit" name={{ad["id"]}} class="btn btn-success" value={{ remove_store }}>
+                    </form>
+                {% else %}
+                    <form action="/passed" method="post" name={{ad["id"]}}>
+                        <input type="submit" name={{ad["id"]}} class="btn btn-success" value={{ remove_store }}>
+                    </form>
+                {%endif%}
+            </td>
+        </tr>
+    {%endfor%}
+</table>
+{%endblock%}

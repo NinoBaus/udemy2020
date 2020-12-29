@@ -1,4 +1,8 @@
-from flask import Flask, request, jsonify, g, session
+'''
+TODO : make expire useful
+'''
+
+from flask import Flask, request, g, session
 from flask import render_template, redirect, url_for
 from resources.api_ads import ads_routes
 from models.settup_filter_page import First_run, Jeson_results
@@ -9,6 +13,7 @@ from db import db, engine
 app = Flask(__name__)
 app.secret_key = "nestoskrivenos"
 app.register_blueprint(ads_routes)
+ads_header = ("Slika","Ime", "Cena", "Istice", "Link")
 
 @app.before_request
 def create_tables():
@@ -23,6 +28,9 @@ def create_tables():
     if 'ad_id' in session:
         g.ad_id = session['ad_id']
 
+    if 'username' in session:
+        g.username = session['username']
+
 @app.route('/', methods=['GET','POST'])
 def home():
     return render_template("start.html")
@@ -35,12 +43,17 @@ def login():
 
 @app.route('/logins', methods=['POST', 'GET'])
 def logins():
-    session.pop('user_id', None)
     condition = Users(username=request.form['username'], password=request.form['password']).login()
     if condition:
+        session['username'] = request.form['username']
         session['user_id'] = condition
         return redirect(url_for('search_ad'))
     return redirect(url_for('login'))
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return render_template("start.html")
 
 @app.route('/signup', methods=['GET','POST'])
 def signup():
@@ -60,40 +73,18 @@ def signups():
 
 @app.route('/search_ad', methods=['GET','POST'])
 def search_ad():
-    #user_id is global before I create user_id available once logged in
-    global ads
-    global prepare
     if request.method == 'GET':
-        return render_template("index.html", hide="hidden", placeholder="Unesite pojam...")
+        if g.user:
+            return render_template("index.html", hide="hidden", placeholder="Unesite pojam...", username=g.username)
+        return render_template("start.html")
     elif request.method == 'POST':
-        '''user_search = str(request.form['searchInput'])
-        prepare = First_run(search=user_search, user_id=g.user)
-        if prepare.valid_search():
-            try:
-                ads = prepare.iterate_ads()
-                ad = next(ads)
-                return render_template("index.html", ad_name=ad[0], price=ad[1], ad_name_href=ad[2], expires=ad[3], picture=ad[4], placeholder=ad[5])
-            except StopIteration:
-                # import ipdb;                ipdb.set_trace()
-                try:
-                    ads = prepare.iterate_ads()
-                    new_batch = next(ads)
-                    return render_template("index.html", ad_name=new_batch[0], price=new_batch[1],
-                                           ad_name_href=new_batch[2],
-                                           expires=new_batch[3],
-                                           picture=new_batch[4], placeholder=new_batch[5])
-                except StopIteration:
-                    return "Nema vise oglasa"
-            except Exception as e:
-                return str(e)
-        return render_template("index.html", hide="hidden", placeholder="Nema oglasa koji trazite, probajte ponovo...")'''
         session['user_search'] = request.form['searchInput']
         start = First_run(session['user_search'], g.user)
         if start.valid_search():
             ad = TableAds().first_add_that_should_be_seen(start.search, g.user)
             session['ad_id'] = ad.id
             return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
-                               picture=ad.picture, placeholder=start.search)
+                               picture=ad.picture, placeholder=start.search, username=g.username)
         return render_template("index.html", hide="hidden", placeholder="Nema oglasa")
 
 @app.route("/store" , methods=['POST'])
@@ -102,29 +93,40 @@ def store():
     ad = TableAds().first_add_that_should_be_seen(g.search, g.user)
     session['ad_id'] = ad.id
     return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
-                           picture=ad.picture, placeholder=g.search)
+                           picture=ad.picture, placeholder=g.search, username=g.username)
 
 
-@app.route("/dont_store" , methods=['POST'])
+@app.route("/dont_store" , methods=['GET','POST'])
 def dont_store():
     TableAds().update_ad_save_remove(id=g.ad_id, store=0)
     ad = TableAds().first_add_that_should_be_seen(g.search, g.user)
     session['ad_id'] = ad.id
     return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
-                           picture=ad.picture, placeholder=g.search)
+                           picture=ad.picture, placeholder=g.search, username=g.username)
 
 @app.route("/saved", methods=["GET","POST"])
 def saved():
+    if not g.user:
+        return render_template("start.html")
+
+    if request.method == 'POST':
+        ad_id, _ = request.form.to_dict().popitem()
+        TableAds().update_ad_save_remove(ad_id, 0)
     saved_ads = TableAds().return_saved_passed(g.search, g.user, 2)
     ads = Jeson_results().pack_json(saved_ads)
-    return jsonify({"oglasi": ads})
+    return render_template("saved_unsaved.html", headers=ads_header, ads=ads, remove_store="Obrisi", username=g.username)
 
 @app.route("/passed", methods=["GET","POST"])
 def passed():
+    if not g.user:
+        return render_template("start.html")
+
+    if request.method == 'POST':
+        ad_id, _ = request.form.to_dict().popitem()
+        TableAds().update_ad_save_remove(ad_id, 2)
     saved_ads = TableAds().return_saved_passed(g.search, g.user, 0)
     ads = Jeson_results().pack_json(saved_ads)
-    return jsonify({"oglasi": ads})
-
+    return render_template("saved_unsaved.html", headers=ads_header, ads=ads, remove_store="Sacuvaj", username=g.username)
 
 if __name__ == '__main__':
     app.run(port=9090, debug=True)
