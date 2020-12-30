@@ -10,12 +10,21 @@
         <li class="nav-item">
             <a class="nav-link" href="/search_ad">Search ads</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/saved">Saved</a>
-        </li>
-        <li class="nav-item">
+        {% if remove_store == "Obrisi" %}
+            <li class="nav-item">
+            <a class="nav-link active" href="/saved">Saved</a>
+            </li>
+            <li class="nav-item">
             <a class="nav-link" href="/passed">Unsaved</a>
-        </li>
+            </li>
+        {% else %}
+            <li class="nav-item">
+            <a class="nav-link" href="/saved">Saved</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link active" href="/passed">Unsaved</a>
+            </li>
+        {%endif%}
     </ul>
 </div>
 

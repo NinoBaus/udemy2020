@@ -64,9 +64,9 @@ def signup():
 
 @app.route('/signups', methods=['POST'])
 def signups():
-    session.pop('user_id', None)
     condition = Users(username=request.form['username'], password=request.form['password']).signup()
     if condition:
+        session['username'] = request.form['username']
         session['user_id'] = condition
         return redirect(url_for('search_ad'))
     return redirect(url_for('signup'))
