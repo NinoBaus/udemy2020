@@ -121,20 +121,19 @@ def saved():
         return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Jos nista niste pretrazivali", username=g.username)
 
     if request.method == 'POST':
-        search = TableAds().all_search_values(user_id=g.user)
+        searching = TableAds().all_search_values(user_id=g.user)
         ad_id, _ = request.form.to_dict().popitem()
-        print(session['search'])
         if not ad_id == 'picked':
             TableAds().update_ad_save_remove(ad_id, 0)
         else:
-            # session['search'] = _
-            g.search = _
-            session['search'] = _
-        print(session['search'])
-        print(g.search)
-    saved_ads = TableAds().return_saved_passed(g.search, g.user, 2)
+            current_search = _
+    try:
+        session['search'] = current_search
+    except:
+        pass
+    saved_ads = TableAds().return_saved_passed(session['search'], g.user, 2)
     ads = Jeson_results().pack_json(saved_ads)
-    return render_template("saved_unsaved.html", headers=ads_header, ads=ads, searches=search, dropdown=g.search,remove_store="Obrisi", username=g.username)
+    return render_template("saved_unsaved.html", headers=ads_header, ads=ads, searches=searching, dropdown=session['search'], remove_store="Obrisi", username=g.username)
 
 @app.route("/passed", methods=["GET","POST"])
 def passed():
