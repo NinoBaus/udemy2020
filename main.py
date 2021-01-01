@@ -78,43 +78,63 @@ def search_ad():
             return render_template("index.html", hide="hidden", placeholder="Unesite pojam...", username=g.username)
         return render_template("start.html")
     elif request.method == 'POST':
-        session['user_search'] = request.form['searchInput']
+        session['user_search'] = request.form['searchInput'].lower()
         start = First_run(session['user_search'], g.user)
         if start.valid_search():
             ad = TableAds().first_add_that_should_be_seen(start.search, g.user)
-            session['ad_id'] = ad.id
-            return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
+            if ad:
+                session['ad_id'] = ad.id
+                return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
                                picture=ad.picture, placeholder=start.search, username=g.username)
+            return render_template("index.html", hide="hidden", placeholder="Pregledani su svi oglasi")
         return render_template("index.html", hide="hidden", placeholder="Nema oglasa")
 
 @app.route("/store" , methods=['POST'])
 def store():
     TableAds().update_ad_save_remove(id=g.ad_id, store=2)
     ad = TableAds().first_add_that_should_be_seen(g.search, g.user)
-    session['ad_id'] = ad.id
-    return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
+    if ad:
+        session['ad_id'] = ad.id
+        return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
                            picture=ad.picture, placeholder=g.search, username=g.username)
-
+    return render_template("index.html", hide="hidden", placeholder="Pregledani su svi oglasi")
 
 @app.route("/dont_store" , methods=['GET','POST'])
 def dont_store():
     TableAds().update_ad_save_remove(id=g.ad_id, store=0)
     ad = TableAds().first_add_that_should_be_seen(g.search, g.user)
-    session['ad_id'] = ad.id
-    return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
+    if ad:
+        session['ad_id'] = ad.id
+        return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
                            picture=ad.picture, placeholder=g.search, username=g.username)
+    return render_template("index.html", hide="hidden", placeholder="Pregledani su svi oglasi")
 
 @app.route("/saved", methods=["GET","POST"])
 def saved():
     if not g.user:
         return render_template("start.html")
 
+    if request.method == 'GET':
+        search = TableAds().all_search_values(user_id=g.user)
+        if search:
+            return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Izaberite pretragu", username=g.username)
+        return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Jos nista niste pretrazivali", username=g.username)
+
     if request.method == 'POST':
+        search = TableAds().all_search_values(user_id=g.user)
         ad_id, _ = request.form.to_dict().popitem()
-        TableAds().update_ad_save_remove(ad_id, 0)
+        print(session['search'])
+        if not ad_id == 'picked':
+            TableAds().update_ad_save_remove(ad_id, 0)
+        else:
+            # session['search'] = _
+            g.search = _
+            session['search'] = _
+        print(session['search'])
+        print(g.search)
     saved_ads = TableAds().return_saved_passed(g.search, g.user, 2)
     ads = Jeson_results().pack_json(saved_ads)
-    return render_template("saved_unsaved.html", headers=ads_header, ads=ads, remove_store="Obrisi", username=g.username)
+    return render_template("saved_unsaved.html", headers=ads_header, ads=ads, searches=search, dropdown=g.search,remove_store="Obrisi", username=g.username)
 
 @app.route("/passed", methods=["GET","POST"])
 def passed():
@@ -129,4 +149,4 @@ def passed():
     return render_template("saved_unsaved.html", headers=ads_header, ads=ads, remove_store="Sacuvaj", username=g.username)
 
 if __name__ == '__main__':
-    app.run(port=9090, debug=True)
+    app.run(debug=True)

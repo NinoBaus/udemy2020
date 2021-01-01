@@ -103,6 +103,14 @@ class TableAds:
         ).order_by(All_ads.updated_at.desc()).first()
         return query
 
+    def all_search_values(self, user_id):
+        query = session.query(All_ads.search).filter(All_ads.user_id == user_id).all()
+        search = set()
+        for d in query:
+            search.add(d[0])
+
+        return search
+
 class User_query:
     def return_user_id_by_username(self, username):
         query = session.query(User).filter(User.username == username).first()

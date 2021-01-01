@@ -2,8 +2,6 @@
 
 {%block title%} {{save}} {%endblock%}
 
-{%block body%}
-
 {%block navbar%}
 <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
@@ -26,10 +24,7 @@
             </li>
         {%endif%}
     </ul>
-</div>
-
-<div class="collapse navbar-collapse" id="navbarNav1">
-   <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ml-auto">
       <li class="nav-item">
          <a class="nav-link" href="#"> {{username}} </a>
       </li>
@@ -38,39 +33,61 @@
       </li>
    </ul>
 </div>
+
 {%endblock%}
-
-
-    <table class="table">
-        <thead class="thead-dark">
-            <tr>
-                {%for header in headers%}
-                    <th scope="col">{{header}}</th>
+{%block body%}
+    <form action="/saved" method="post" id="selectForm" class="center">
+        <select class="browser-default custom-select" id="selected_search" name="picked">
+            <option selected="">{{ dropdown }}</option>
+                {%for search in searches%}
+                <option value="{{search}}"> {{ search }}</option>
                 {%endfor%}
-                <th> {{ remove_store }} </th>
-            </tr>
-        </thead>
+        </select>
+    </form>
+    <script type="text/javascript">
+        $(function() {
+            $('#selected_search').on('change', function(event) {
+                document.getElementById("selectForm").submit();
+            });
+        });
+    </script>
+
+    <div class="row" {{ hide }}>
     {%for ad in ads%}
-        <tr>
-            <td><img src="{{ ad['picture'] }}" width="100" height="100"></td>
-            <td>{{ ad["name"] }}</td>
-            <td>{{ ad["price"] }}</td>
-            <td>{{ ad["expire"] }}</td>
-            <td>
-                    <a href={{ ad["link"] }} target=_blank{{ ad["link"] }}> Link
-            </td>
-            <td>
-                {% if remove_store == "Obrisi" %}
-                    <form action="/saved" method="post">
-                        <input type="submit" name={{ad["id"]}} class="btn btn-success" value={{ remove_store }}>
-                    </form>
-                {% else %}
-                    <form action="/passed" method="post" name={{ad["id"]}}>
-                        <input type="submit" name={{ad["id"]}} class="btn btn-success" value={{ remove_store }}>
-                    </form>
-                {%endif%}
-            </td>
-        </tr>
+        <div class="col-xs-12 col-md-4">
+            <table class="table">
+                <thead class="thead-dark center">
+                    <tr>
+                        <th scope="col" colspan="3">{{ ad["name"] }}</th>
+                    </tr>
+                </thead>
+                <tbody class="table table-light" align="center">
+                    <tr>
+                    <td colspan="3">
+                        <a href={{ ad["link"] }} target=_blank{{ ad["link"] }}>
+                        <img src="{{ ad['picture'] }}" width="100" height="100"></td>
+                </tr>
+                    <tr>
+                    <td>Cena:<br>
+                        {{ ad["price"] }}</td>
+                    <td>Istice:<br>
+                        {{ ad["expire"] }}</td>
+
+                    <td>
+                        {% if remove_store == "Obrisi" %}
+                            <form action="/saved" method="post">
+                                <input type="submit" name={{ad["id"]}} class="btn btn-success" value={{ remove_store }}>
+                            </form>
+                        {% else %}
+                            <form action="/passed" method="post" name={{ad["id"]}}>
+                                <input type="submit" name={{ad["id"]}} class="btn btn-success" value={{ remove_store }}>
+                            </form>
+                        {%endif%}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     {%endfor%}
-</table>
+    </div>
 {%endblock%}

@@ -2,6 +2,7 @@
 
 {%block title%} Limundo-Tracker {% endblock %}
 
+
 {%block navbar%}
 <div class="collapse navbar-collapse" id="navbarNav">
    <ul class="navbar-nav">
@@ -15,14 +16,11 @@
          <a class="nav-link" href="/passed">Unsaved</a>
       </li>
    </ul>
-</div>
-
-<div class="collapse navbar-collapse" id="navbarNav1">
    <ul class="navbar-nav ml-auto">
       <li class="nav-item">
          <a class="nav-link" href="#"> {{username}} </a>
       </li>
-      <li class="nav-item active">
+      <li class="nav-item">
          <a class="nav-link" href="/logout">Log out</a>
       </li>
    </ul>
@@ -31,7 +29,7 @@
 
 
 {%block body%}
-   <h1 style="text-align: center">Dobro dosli na tracker za Limundo aukcije</h1>
+   <h4 style="text-align: center">Dobro dosli na tracker za Limundo aukcije</h4>
    <div class="search" style="text-align: center" >
    </div>
 
@@ -45,7 +43,7 @@
       </div>
    </div>
 
-   <div class="container"  {{ hide }}>
+   <div class="container center"  {{ hide }}>
       <div class="row">
          <div class="col-12" style="text-align:center">
             <div style="text-align:center" class="current_ad">
@@ -70,18 +68,17 @@
             <img class="img-thumbnail" src={{ picture }} alt="User Image" width="400" height="400">
          </div>
 
-         <div class="col-3"></div>
-         <div class="col-3" style="text-align:center">
+         <div class="col-6" style="text-align:center">
             <form action="/store" name="saveForm" id="buttonsSave" method="post">
                <input type="submit" class="btn btn-success" value="Sacuvaj">
             </form>
          </div>
-         <div class="col-3" style="text-align:center">
+         <div class="col-6" style="text-align:center">
             <form action="/dont_store" name="passForm" id="buttonPass" method="post">
                <input type="submit" class="btn btn-danger" value="Propusti">
             </form>
          </div>
-         <div class="col-3"></div>
+
 
       </div>
    </div>
