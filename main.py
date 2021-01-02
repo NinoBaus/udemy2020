@@ -117,8 +117,8 @@ def saved():
     if request.method == 'GET':
         search = TableAds().all_search_values(user_id=g.user)
         if search:
-            return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Izaberite pretragu", username=g.username)
-        return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Jos nista niste pretrazivali", username=g.username)
+            return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Izaberite pretragu", username=g.username, remove_store="Obrisi")
+        return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Jos nista niste pretrazivali", username=g.username, remove_store="Obrisi")
 
     if request.method == 'POST':
         searching = TableAds().all_search_values(user_id=g.user)
@@ -133,19 +133,47 @@ def saved():
         pass
     saved_ads = TableAds().return_saved_passed(session['search'], g.user, 2)
     ads = Jeson_results().pack_json(saved_ads)
-    return render_template("saved_unsaved.html", headers=ads_header, ads=ads, searches=searching, dropdown=session['search'], remove_store="Obrisi", username=g.username)
+    return render_template("saved_unsaved.html",
+                           headers=ads_header,
+                           ads=ads,
+                           searches=searching,
+                           dropdown=session['search'],
+                           remove_store="Obrisi",
+                           username=g.username)
 
 @app.route("/passed", methods=["GET","POST"])
 def passed():
     if not g.user:
         return render_template("start.html")
 
+    if request.method == 'GET':
+        search = TableAds().all_search_values(user_id=g.user)
+        if search:
+            return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Izaberite pretragu", username=g.username, remove_store="Sacuvaj")
+        return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Jos nista niste pretrazivali", username=g.username, remove_store="Sacuvaj")
+
     if request.method == 'POST':
+        searching = TableAds().all_search_values(user_id=g.user)
         ad_id, _ = request.form.to_dict().popitem()
-        TableAds().update_ad_save_remove(ad_id, 2)
-    saved_ads = TableAds().return_saved_passed(g.search, g.user, 0)
+        if not ad_id == 'picked':
+            TableAds().update_ad_save_remove(ad_id, 2)
+        else:
+            current_search = _
+
+    try:
+        session['search'] = current_search
+    except:
+        pass
+
+    saved_ads = TableAds().return_saved_passed(session['search'], g.user, 0)
     ads = Jeson_results().pack_json(saved_ads)
-    return render_template("saved_unsaved.html", headers=ads_header, ads=ads, remove_store="Sacuvaj", username=g.username)
+    return render_template("saved_unsaved.html",
+                           headers=ads_header,
+                           ads=ads,
+                           searches=searching,
+                           dropdown=session['search'],
+                           remove_store="Sacuvaj",
+                           username=g.username)
 
 if __name__ == '__main__':
     app.run(debug=True)

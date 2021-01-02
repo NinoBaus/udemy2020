@@ -36,21 +36,39 @@
 
 {%endblock%}
 {%block body%}
-    <form action="/saved" method="post" id="selectForm" class="center">
-        <select class="browser-default custom-select" id="selected_search" name="picked">
-            <option selected="">{{ dropdown }}</option>
-                {%for search in searches%}
-                <option value="{{search}}"> {{ search }}</option>
-                {%endfor%}
-        </select>
-    </form>
-    <script type="text/javascript">
-        $(function() {
-            $('#selected_search').on('change', function(event) {
-                document.getElementById("selectForm").submit();
+    {% if remove_store == "Sacuvaj" %}
+        <form action="/passed" method="post" id="selectForm" class="center">
+            <select class="browser-default custom-select" id="selected_search" name="picked">
+                <option selected="">{{ dropdown }}</option>
+                    {%for search in searches%}
+                    <option value="{{search}}"> {{ search }}</option>
+                    {%endfor%}
+            </select>
+        </form>
+        <script type="text/javascript">
+            $(function() {
+                $('#selected_search').on('change', function(event) {
+                    document.getElementById("selectForm").submit();
+                });
             });
-        });
-    </script>
+        </script>
+    {% else %}
+        <form action="/saved" method="post" id="selectFormSaved" class="center">
+            <select class="browser-default custom-select" id="selected_search_saved" name="picked">
+                <option selected="">{{ dropdown }}</option>
+                    {%for search in searches%}
+                    <option value="{{search}}"> {{ search }}</option>
+                    {%endfor%}
+            </select>
+        </form>
+        <script type="text/javascript">
+            $(function() {
+                $('#selected_search_saved').on('change', function(event) {
+                    document.getElementById("selectFormSaved").submit();
+                });
+            });
+        </script>
+    {% endif %}
 
     <div class="row" {{ hide }}>
     {%for ad in ads%}
