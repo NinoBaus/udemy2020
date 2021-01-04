@@ -6,8 +6,8 @@ from sqlalchemy import and_
 
 
 class TableAds:
-    def create_all_ads(self, name, price, picture, expire, link, search, user_id):
-        query = All_ads(name=name, price=price, picture=picture, expire=expire, link=link, search=search, user_id=user_id)
+    def create_all_ads(self, name, price, picture, expire, link, search, user_id, expire_unix):
+        query = All_ads(name=name, price=price, picture=picture, expire=expire, link=link, search=search, user_id=user_id, expire_unix=expire_unix)
         session.add(query)
         session.commit()
 
@@ -89,7 +89,7 @@ class TableAds:
                 All_ads.user_id == user_id,
                 All_ads.show == show
             )
-        )
+        ).order_by(All_ads.expire_unix.asc())
         data = query.all()
         return data
 
@@ -100,7 +100,7 @@ class TableAds:
                 All_ads.user_id == user_id,
                 All_ads.show == 1
             )
-        ).order_by(All_ads.updated_at.desc()).first()
+        ).order_by(All_ads.expire_unix.asc()).first()
         return query
 
     def all_search_values(self, user_id):

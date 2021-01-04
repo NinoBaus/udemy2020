@@ -9,6 +9,7 @@ class All_ads(db):
     price = Column(Integer())
     picture = Column(String())
     expire = Column(String())
+    expire_unix = Column(Integer())
     link = Column(String())
     search = Column(String())
     show = Column(Integer(), default=1)

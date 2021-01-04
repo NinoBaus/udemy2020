@@ -2,6 +2,8 @@ import requests as req
 from bs4 import BeautifulSoup as Soup
 from models.tablecreator import TableAds
 from threading import Thread
+import time
+import re
 
 class Pack:
     def __init__(self, user_id, search=""):
@@ -33,16 +35,19 @@ class Pack:
 
     def iterate_pages(self, page_number):
         # iterate through pages
-        import time
-        time.sleep(5)
+        # import time
+        # time.sleep(5)
         for i in range(page_number):
-            url = self.url_auction + str(i)
-            self.return_ads(self.user_id, url)
+            if i == 0 or i == 1:
+                pass
+            else:
+                url = self.url_auction + str(i)
+                self.return_ads(self.user_id, url)
 
     def return_ads(self, user_id, url):
         '''
         Storring data in db.
-        :param user_id:
+        :param user_id and page url:
         :return: Currently nothing.
         :TODO: Make this callable so it is more readable and it would be used only to get ads from the page
         '''
@@ -96,15 +101,31 @@ class Pack:
             ad_expire_finder = ads.find(class_="lista_time")
             ad_expire = ad_expire_finder.text.strip("\n")
 
+            #AD_EXPIRE_UNIX_TIME
+            current_unix_date = int(time.time())
+            if "sek" in ad_expire:
+                ad_expire_unix = int(re.sub("[^0-9]", "", ad_expire))
+            elif "min" in ad_expire:
+                minut = int(re.sub("[^0-9]", "", ad_expire))
+                ad_expire_unix = minut * 60
+            elif "sat" in ad_expire:
+                sat = int(re.sub("[^0-9]", "", ad_expire))
+                ad_expire_unix = sat * 3600
+            elif "dan" in ad_expire:
+                dan = int(re.sub("[^0-9]", "", ad_expire))
+                ad_expire_unix = dan * 86400
+
+            ad_expire_unix_time = ad_expire_unix + current_unix_date
+
             #AD_LINK
             ad_link_finder = ads.find("a", href=True)
             ad_link = ad_link_finder["href"]
             #CHECK IF LINK EXISTS FOR USER_ID
             if self.get_search:
                 if not TableAds().retrive_if_link_exists_and_user_id(link=ad_link, user_id=self.user_id, expire=ad_expire, price=ad_price):
-                    TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, link=ad_link, search=self.search, user_id=user_id)
+                    TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, link=ad_link, search=self.search, user_id=user_id, expire_unix=ad_expire_unix_time)
             else:
-                TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire,
+                TableAds().create_all_ads(name=ad_name, price=ad_price, picture=ad_picture, expire=ad_expire, expire_unix=ad_expire_unix_time,
                                           link=ad_link, search=self.search, user_id=user_id)
 
             response.close()
@@ -123,6 +144,7 @@ class Pack:
                     pages_number.append(pages)
                 except:
                     pass
+
             return pages_number[-1]
 
     def check_if_search_is_valid(self):
