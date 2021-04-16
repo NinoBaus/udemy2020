@@ -13,7 +13,8 @@ from db import db, engine
 app = Flask(__name__)
 app.secret_key = "nestoskrivenos"
 app.register_blueprint(ads_routes)
-ads_header = ("Slika","Ime", "Cena", "Istice", "Link")
+ads_header = ("Slika", "Ime", "Cena", "Istice", "Link")
+
 
 @app.before_request
 def create_tables():
@@ -31,15 +32,18 @@ def create_tables():
     if 'username' in session:
         g.username = session['username']
 
-@app.route('/', methods=['GET','POST'])
+
+@app.route('/', methods=['GET', 'POST'])
 def home():
     return render_template("start.html")
 
-@app.route('/login', methods=['GET','POST'])
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
         return render_template("login.html", login_title="Wrong username or password")
     return render_template("login.html", login_title="Login")
+
 
 @app.route('/logins', methods=['POST', 'GET'])
 def logins():
@@ -50,12 +54,14 @@ def logins():
         return redirect(url_for('search_ad'))
     return redirect(url_for('login'))
 
+
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
     return render_template("start.html")
 
-@app.route('/signup', methods=['GET','POST'])
+
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
         return render_template("signup.html", signup_title="Username already exists!")
@@ -71,7 +77,8 @@ def signups():
         return redirect(url_for('search_ad'))
     return redirect(url_for('signup'))
 
-@app.route('/search_ad', methods=['GET','POST'])
+
+@app.route('/search_ad', methods=['GET', 'POST'])
 def search_ad():
     if request.method == 'GET':
         if g.user:
@@ -84,44 +91,58 @@ def search_ad():
             ad = TableAds().first_add_that_should_be_seen(start.search, g.user)
             if ad:
                 session['ad_id'] = ad.id
-                return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
-                               picture=ad.picture, placeholder=start.search, username=g.username)
+                return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link,
+                                       expires=ad.expire,
+                                       picture=ad.picture, placeholder=start.search, username=g.username)
             return render_template("index.html", hide="hidden", placeholder="Pregledani su svi oglasi")
         return render_template("index.html", hide="hidden", placeholder="Nema oglasa")
 
-@app.route("/store" , methods=['POST'])
+
+@app.route("/store", methods=['POST'])
 def store():
     TableAds().update_ad_save_remove(id=g.ad_id, store=2)
     ad = TableAds().first_add_that_should_be_seen(g.search, g.user)
     if ad:
         session['ad_id'] = ad.id
         return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
-                           picture=ad.picture, placeholder=g.search, username=g.username)
+                               picture=ad.picture, placeholder=g.search, username=g.username)
     return render_template("index.html", hide="hidden", placeholder="Pregledani su svi oglasi")
 
-@app.route("/dont_store" , methods=['GET','POST'])
+
+@app.route("/dont_store", methods=['GET', 'POST'])
 def dont_store():
     TableAds().update_ad_save_remove(id=g.ad_id, store=0)
     ad = TableAds().first_add_that_should_be_seen(g.search, g.user)
     if ad:
         session['ad_id'] = ad.id
         return render_template("index.html", ad_name=ad.name, price=ad.price, ad_name_href=ad.link, expires=ad.expire,
-                           picture=ad.picture, placeholder=g.search, username=g.username)
+                               picture=ad.picture, placeholder=g.search, username=g.username)
     return render_template("index.html", hide="hidden", placeholder="Pregledani su svi oglasi")
 
-@app.route("/saved", methods=["GET","POST"])
+
+@app.route("/saved", methods=["GET", "POST"])
 def saved():
     if not g.user:
         return render_template("start.html")
 
+    searches = TableAds().all_search_values(user_id=g.user)
+    searches_with_item = []
+    try:
+        for search in searches:
+            values = TableAds().check_if_exists(search=search, user_id=g.user, save_pass=2)
+            if values:
+                searches_with_item.append(values)
+    except:
+        pass
+
     if request.method == 'GET':
-        search = TableAds().all_search_values(user_id=g.user)
-        if search:
-            return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Izaberite pretragu", username=g.username, remove_store="Obrisi")
-        return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Jos nista niste pretrazivali", username=g.username, remove_store="Obrisi")
+        if searches_with_item:
+            return render_template("saved_unsaved.html", hide="hidden", searches=searches_with_item,
+                                   dropdown="Izaberite pretragu", username=g.username, remove_store="Obrisi")
+        return render_template("saved_unsaved.html", hide="hidden", searches=searches_with_item,
+                               dropdown="Jos nista niste sacuvali", username=g.username, remove_store="Obrisi")
 
     if request.method == 'POST':
-        searching = TableAds().all_search_values(user_id=g.user)
         ad_id, _ = request.form.to_dict().popitem()
         if not ad_id == 'picked':
             TableAds().update_ad_save_remove(ad_id, 0)
@@ -136,24 +157,35 @@ def saved():
     return render_template("saved_unsaved.html",
                            headers=ads_header,
                            ads=ads,
-                           searches=searching,
+                           searches=searches_with_item,
                            dropdown=session['search'],
                            remove_store="Obrisi",
                            username=g.username)
 
-@app.route("/passed", methods=["GET","POST"])
+
+@app.route("/passed", methods=["GET", "POST"])
 def passed():
     if not g.user:
         return render_template("start.html")
 
+    searches = TableAds().all_search_values(user_id=g.user)
+    searches_with_item = []
+    try:
+        for search in searches:
+            values = TableAds().check_if_exists(search=search, user_id=g.user, save_pass=0)
+            if values:
+                searches_with_item.append(values)
+    except:
+        pass
+
     if request.method == 'GET':
-        search = TableAds().all_search_values(user_id=g.user)
-        if search:
-            return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Izaberite pretragu", username=g.username, remove_store="Sacuvaj")
-        return render_template("saved_unsaved.html", hide="hidden", searches=search, dropdown="Jos nista niste pretrazivali", username=g.username, remove_store="Sacuvaj")
+        if searches_with_item:
+            return render_template("saved_unsaved.html", hide="hidden", searches=searches_with_item,
+                                   dropdown="Izaberite pretragu", username=g.username, remove_store="Sacuvaj")
+        return render_template("saved_unsaved.html", hide="hidden", searches=searches_with_item,
+                               dropdown="Jos nista niste propustili", username=g.username, remove_store="Sacuvaj")
 
     if request.method == 'POST':
-        searching = TableAds().all_search_values(user_id=g.user)
         ad_id, _ = request.form.to_dict().popitem()
         if not ad_id == 'picked':
             TableAds().update_ad_save_remove(ad_id, 2)
@@ -170,10 +202,11 @@ def passed():
     return render_template("saved_unsaved.html",
                            headers=ads_header,
                            ads=ads,
-                           searches=searching,
+                           searches=searches_with_item,
                            dropdown=session['search'],
                            remove_store="Sacuvaj",
                            username=g.username)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

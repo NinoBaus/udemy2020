@@ -3,11 +3,13 @@ from db import session
 from models.all_ads import All_ads
 from models.user import User
 from sqlalchemy import and_
+import time
 
 
 class TableAds:
     def create_all_ads(self, name, price, picture, expire, link, search, user_id, expire_unix):
-        query = All_ads(name=name, price=price, picture=picture, expire=expire, link=link, search=search, user_id=user_id, expire_unix=expire_unix)
+        query = All_ads(name=name, price=price, picture=picture, expire=expire, link=link, search=search,
+                        user_id=user_id, expire_unix=expire_unix)
         session.add(query)
         session.commit()
 
@@ -108,8 +110,22 @@ class TableAds:
         search = set()
         for d in query:
             search.add(d[0])
-
         return search
+
+    def check_if_exists(self, search, user_id, save_pass):
+        query = session.query(All_ads).filter(
+            and_(
+                All_ads.user_id == user_id,
+                All_ads.search == search,
+                All_ads.show == save_pass
+            )
+        ).order_by(All_ads.expire_unix.desc()).first()
+
+        try:
+            if not query.expire_unix < int(time.time()):
+                return query.search
+        except:
+            pass
 
 class User_query:
     def return_user_id_by_username(self, username):

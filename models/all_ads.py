@@ -2,6 +2,7 @@ from db import db
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from datetime import datetime
 
+
 class All_ads(db):
     __tablename__ = "all_ads"
     id = Column(Integer(), primary_key=True)
@@ -16,3 +17,6 @@ class All_ads(db):
     created_at = Column(DateTime(), default=datetime.now)
     updated_at = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
     user_id = Column(Integer())
+
+    def __str__(self):
+        return f"{self.expire}, {self.show}, {self.created_at}"
